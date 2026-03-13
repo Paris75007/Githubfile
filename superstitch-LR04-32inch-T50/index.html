@@ -7,54 +7,53 @@
 </head>
 <body style="margin:0; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:-apple-system, sans-serif; background-color: #fff; overflow: hidden;">
 
-    <div id="content-area" style="width: 100%; height: 100%;">
-        </div>
+    <div id="content-area" style="width: 100%; height: 100%;"></div>
 
     <script>
-        // 設定項目
-        // 今日の日付が2026年3月13日なので、期限を3月14日に更新しています
-        const deadline = new Date('2026-03-14T00:00:00+09:00');
-        const usdzFile = "superstitch-LR04-32inch-T50.usdz#allowsRemoteThreshold=0";
+        // 【設定】ファイル名を正確に反映
+        const usdzFile = "superstitch-LR04-32inch-T50.usdz";
+       
+        // 【設定】期限（現在2026年3月13日なので、3月20日まで有効に設定）
+        const deadline = new Date('2026-03-20T00:00:00+09:00');
+       
         const contactEmail = "monsieurmushi@gmail.com";
-
         const now = new Date();
         const contentArea = document.getElementById('content-area');
 
         if (now < deadline) {
-            // 【期限内】画面全体を巨大な起動ボタンにして、タップ漏れを防ぐ
+            // カメラ起動を最優先にするパラメータを付与
+            const fullPath = usdzFile + "#allowsRemoteThreshold=0";
+
             contentArea.innerHTML = `
-                <a id="ar-link" rel="ar" href="${usdzFile}" style="display:flex; flex-direction:column; justify-content:center; align-items:center; width:100%; height:100%; text-decoration:none; -webkit-tap-highlight-color:transparent;">
+                <a id="ar-link" rel="ar" href="${fullPath}" style="display:flex; flex-direction:column; justify-content:center; align-items:center; width:100%; height:100%; text-decoration:none; -webkit-tap-highlight-color:transparent;">
                     <img src="https://developer.apple.com/assets/elements/icons/augmented-reality/augmented-reality-64x64_2x.png" width="100" style="margin-bottom:20px;">
-                    <p style="color:#007aff; font-size:20px; font-weight:bold;">タップしてARを開始</p>
-                    <p style="color:#888; font-size:12px; margin-top:8px;">Tap to launch Camera</p>
+                    <p style="color:#007aff; font-size:22px; font-weight:bold;">タップしてARを開始</p>
+                    <p style="color:#8e8e93; font-size:14px; margin-top:8px;">Touch to Place Avatar</p>
                 </a>
             `;
 
-            // ページ読み込み完了後、可能な限り早くクリックイベントを試行
-            // ※iOSの制限により「ユーザーの指が触れる」必要がありますが、
-            //   この巨大ボタンならメールから飛んできた瞬間の「ついでタップ」で即起動します
+            // ページ読み込みの瞬間、自動クリックを試行（iPhone Safariの仕様により、タップが必要な場合があります）
             setTimeout(function() {
-                document.getElementById('ar-link').click();
-            }, 100);
+                const link = document.getElementById('ar-link');
+                if(link) link.click();
+            }, 50);
 
         } else {
-            // 【期限切れ】ご指定のフランス語と英語のメッセージ
+            // 期限切れメッセージ（フランス語・英語）
             contentArea.innerHTML = `
                 <div style="padding: 40px; line-height: 1.6; color: #333; text-align: center;">
                     <div style="margin-bottom: 30px;">
                         <p style="font-weight: bold; color:#ff3b30;">La période de consultation publique est terminée. Merci de votre visite.</p>
-                        <p>Pour toute demande concernant le service, veuillez contacter YOSHI à <a href="mailto:${contactEmail}" style="color: #007aff; text-decoration:none;">${contactEmail}</a>.</p>
+                        <p>Pour toute demande, veuillez contacter YOSHI à <a href="mailto:${contactEmail}" style="color: #007aff; text-decoration:none;">${contactEmail}</a>.</p>
                     </div>
                     <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
                     <div>
                         <p style="font-weight: bold; color:#ff3b30;">The public viewing period has ended. Thank you for viewing.</p>
-                        <p>For inquiries regarding the service, please contact YOSHI at <a href="mailto:${contactEmail}" style="color: #007aff; text-decoration:none;">${contactEmail}</a>.</p>
+                        <p>For inquiries, please contact YOSHI at <a href="mailto:${contactEmail}" style="color: #007aff; text-decoration:none;">${contactEmail}</a>.</p>
                     </div>
                 </div>
             `;
         }
     </script>
-
 </body>
 </html>
-
