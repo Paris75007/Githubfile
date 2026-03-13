@@ -5,55 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AR Avatar View</title>
 </head>
-<body style="margin:0; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; font-family:-apple-system, sans-serif; background-color: #fff; overflow: hidden;">
+<body style="margin:0; display:flex; justify-content:center; align-items:center; height:100vh; font-family:-apple-system, sans-serif; background-color: #fff;">
 
     <div id="content-area" style="width: 100%; height: 100%;"></div>
 
     <script>
-        // 【設定】ファイル名を正確に反映
+        // 設定
         const usdzFile = "superstitch-LR04-32inch-T50.usdz";
-       
-        // 【設定】期限（現在2026年3月13日なので、3月20日まで有効に設定）
         const deadline = new Date('2026-03-20T00:00:00+09:00');
-       
         const contactEmail = "monsieurmushi@gmail.com";
-        const now = new Date();
+       
         const contentArea = document.getElementById('content-area');
 
-        if (now < deadline) {
-            // カメラ起動を最優先にするパラメータを付与
-            const fullPath = usdzFile + "#allowsRemoteThreshold=0";
+        if (new Date() < deadline) {
+            // パラメータの構成
+            // #arDirect=1 : カメラを最優先で起動
+            // #allowsRemoteThreshold=0 : 環境認識を待たずにAR移行
+            // #checkoutTitle : 画面上部のラベルを「AR表示」に変更
+            const fullPath = usdzFile + "#arDirect=1&allowsRemoteThreshold=0&checkoutTitle=AR表示";
 
             contentArea.innerHTML = `
                 <a id="ar-link" rel="ar" href="${fullPath}" style="display:flex; flex-direction:column; justify-content:center; align-items:center; width:100%; height:100%; text-decoration:none; -webkit-tap-highlight-color:transparent;">
-                    <img src="https://developer.apple.com/assets/elements/icons/augmented-reality/augmented-reality-64x64_2x.png" width="100" style="margin-bottom:20px;">
-                    <p style="color:#007aff; font-size:22px; font-weight:bold;">タップしてARを開始</p>
-                    <p style="color:#8e8e93; font-size:14px; margin-top:8px;">Touch to Place Avatar</p>
+                    <img src="https://developer.apple.com/assets/elements/icons/augmented-reality/augmented-reality-64x64_2x.png" width="100">
+                    <p style="color:#007aff; font-size:22px; font-weight:bold; margin-top:20px;">ARで表示する</p>
+                    <p style="color:#8e8e93; font-size:14px; margin-top:8px;">タップしてカメラを起動します</p>
                 </a>
             `;
 
-            // ページ読み込みの瞬間、自動クリックを試行（iPhone Safariの仕様により、タップが必要な場合があります）
-            setTimeout(function() {
+            // 自動クリック試行
+            setTimeout(() => {
                 const link = document.getElementById('ar-link');
                 if(link) link.click();
-            }, 50);
+            }, 100);
 
         } else {
-            // 期限切れメッセージ（フランス語・英語）
+            // 期限切れ表示（フランス語・英語）
             contentArea.innerHTML = `
-                <div style="padding: 40px; line-height: 1.6; color: #333; text-align: center;">
-                    <div style="margin-bottom: 30px;">
-                        <p style="font-weight: bold; color:#ff3b30;">La période de consultation publique est terminée. Merci de votre visite.</p>
-                        <p>Pour toute demande, veuillez contacter YOSHI à <a href="mailto:${contactEmail}" style="color: #007aff; text-decoration:none;">${contactEmail}</a>.</p>
-                    </div>
-                    <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
-                    <div>
-                        <p style="font-weight: bold; color:#ff3b30;">The public viewing period has ended. Thank you for viewing.</p>
-                        <p>For inquiries, please contact YOSHI at <a href="mailto:${contactEmail}" style="color: #007aff; text-decoration:none;">${contactEmail}</a>.</p>
-                    </div>
+                <div style="padding: 40px; line-height: 1.6; text-align: center;">
+                    <p style="font-weight: bold; color:#ff3b30;">La période est terminée. Merci.</p>
+                    <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+                    <p style="font-weight: bold; color:#ff3b30;">The period has ended. Thank you.</p>
                 </div>
             `;
         }
     </script>
 </body>
 </html>
+
