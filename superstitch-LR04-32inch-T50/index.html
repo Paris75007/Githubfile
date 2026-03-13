@@ -2,118 +2,94 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AR Avatar View</title>
     <style>
-        /* 全体のベースデザインをiOSライクに洗練 */
-        body {
-            margin:0;
-            display:flex;
-            flex-direction:column;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
+        /* 全体のスタイル設定 */
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background-color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            padding: 20px;
+        }
+
+        /* 期限内：画面全体をAR起動ボタンにする */
+        .ar-launcher {
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            width: 100%; height: 100%;
+            text-decoration: none; -webkit-tap-highlight-color: transparent;
             text-align: center;
-            box-sizing: border-box;
-            background-color: #f2f2f7; /* iOSの標準的な背景色 */
         }
-       
-        #content-area {
-            width: 100%;
-            max-width: 400px;
+        .ar-launcher .icon {
+            width: 100px; height: 100px; margin-bottom: 24px;
+            animation: pulse 2s infinite ease-in-out;
         }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .ar-launcher .text { color: #007aff; font-size: 22px; font-weight: 600; }
+        .ar-launcher .sub-text { color: #8e8e93; font-size: 14px; margin-top: 8px; }
 
-        /* AR起動ボタンのデザイン */
-        .ar-button {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            background: #ffffff;
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-            transition: transform 0.2s ease;
+        /* 期限切れ：多言語メッセージのデザイン */
+        .message-container {
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; padding: 20px; box-sizing: border-box; background-color: #f2f2f7;
         }
-        .ar-button:active {
-            transform: scale(0.96); /* タップ時のリアクション */
-        }
-        .ar-button img {
-            width: 80px;
-            margin-bottom: 16px;
-        }
-        .ar-button p {
-            color: #007aff;
-            font-weight: 600;
-            margin: 0;
-            font-size: 20px;
-        }
-        .ar-button span {
-            font-size: 13px;
-            color: #8e8e93;
-            margin-top: 8px;
-        }
-
-        /* 期限切れメッセージのデザイン */
         .message-box {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-            line-height: 1.6;
-            color: #333;
+            background: #ffffff; padding: 40px 30px; border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center;
         }
-        .message-box p {
-            margin: 8px 0;
-        }
-        .alert-title {
-            font-weight: bold;
-            color: #ff3b30; /* iOSのシステムレッド */
-        }
+        .alert-title { font-weight: bold; color: #ff3b30; font-size: 1.1em; margin-bottom: 8px; }
+        .alert-sub { font-size: 0.95em; color: #333; margin-bottom: 20px; line-height: 1.5; }
+        .contact { font-size: 0.9em; color: #8e8e93; }
+        .contact a { color: #007aff; text-decoration: none; font-weight: 500; }
+        hr { border: 0; border-top: 1px solid #e5e5ea; margin: 30px 0; }
     </style>
 </head>
 <body>
 
-    <div id="content-area"></div>
+    <div id="content"></div>
 
     <script>
         // 設定項目
-        const deadline = new Date('2026-03-14T00:00:00+09:00'); // 期限：2026年3月14日 00:00
-        const usdzFile = "superstitch-LR04-32inch-T50.usdz";
+        const deadline = new Date('2026-03-14T00:00:00+09:00');
+        // カメラ（ARモード）を優先して起動させるためのパラメータを追加
+        const usdzFile = "superstitch-LR04-32inch-T50.usdz#allowsRemoteThreshold=0";
         const contactEmail = "monsieurmushi@gmail.com";
 
         const now = new Date();
-        const contentArea = document.getElementById('content-area');
+        const contentArea = document.getElementById('content');
 
         if (now < deadline) {
-            // 【期限内】タップを促すAR起動ボタンを表示
+            // 【期限内】画面全体を巨大なARトリガーにする
+            // rel="ar" と <img> を含めることでiOSのAR Quick Lookを即時発動させやすくします
             contentArea.innerHTML = `
-                <a id="ar-link" rel="ar" href="${usdzFile}" class="ar-button">
-                    <img src="https://developer.apple.com/assets/elements/icons/augmented-reality/augmented-reality-64x64_2x.png" alt="AR Icon">
-                    <p>ARで表示する</p>
-                    <span>画面をタップして起動</span>
+                <a rel="ar" href="${usdzFile}" class="ar-launcher">
+                    <img src="https://developer.apple.com/assets/elements/icons/augmented-reality/augmented-reality-64x64_2x.png" class="icon" alt="AR">
+                    <div class="text">タップしてカメラを起動</div>
+                    <div class="sub-text">Place the avatar in your room</div>
                 </a>
             `;
-           
-            // ※ iOS Safariの仕様上、JSによる自動クリックはブロックされるため削除しています。
-            // 代わりにCSSでボタンを押しやすく・目立たせています。
-
         } else {
             // 【期限切れ】フランス語と英語のメッセージを表示
             contentArea.innerHTML = `
-                <div class="message-box">
-                    <div style="margin-bottom: 24px;">
-                        <p class="alert-title">La période de consultation publique est terminée.</p>
-                        <p>Merci de votre visite.</p>
-                        <p style="font-size: 0.9em; margin-top: 12px;">Pour toute demande, veuillez contacter YOSHI à<br><a href="mailto:${contactEmail}" style="color: #007aff; text-decoration: none;">${contactEmail}</a></p>
-                    </div>
-                    <hr style="border: 0; border-top: 1px solid #e5e5ea; margin: 24px 0;">
-                    <div>
-                        <p class="alert-title">The public viewing period has ended.</p>
-                        <p>Thank you for viewing.</p>
-                        <p style="font-size: 0.9em; margin-top: 12px;">For inquiries, please contact YOSHI at<br><a href="mailto:${contactEmail}" style="color: #007aff; text-decoration: none;">${contactEmail}</a></p>
+                <div class="message-container">
+                    <div class="message-box">
+                        <div>
+                            <p class="alert-title">La période de consultation publique est terminée.</p>
+                            <p class="alert-sub">Merci de votre visite.</p>
+                            <p class="contact">Pour toute demande, veuillez contacter YOSHI à<br>
+                               <a href="mailto:${contactEmail}">${contactEmail}</a></p>
+                        </div>
+                        <hr>
+                        <div>
+                            <p class="alert-title">The public viewing period has ended.</p>
+                            <p class="alert-sub">Thank you for viewing.</p>
+                            <p class="contact">For inquiries, please contact YOSHI at<br>
+                               <a href="mailto:${contactEmail}">${contactEmail}</a></p>
+                        </div>
                     </div>
                 </div>
             `;
@@ -122,4 +98,5 @@
 
 </body>
 </html>
+
 
